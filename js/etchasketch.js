@@ -58,6 +58,14 @@ function erasePixel(el) {
 	el.removeAttribute("style");
 }
 
+function darkenPixel(el) {
+	// Darken color of drawn pixel
+}
+
+function lightenPixel(el) {
+	// Lighten color of drawn pixel
+}
+
 function rainbowPixel(el) {
 	const rNum = Math.floor(Math.random() * 255);
 	const gNum = Math.floor(Math.random() * 255);
@@ -66,7 +74,6 @@ function rainbowPixel(el) {
 	el.style.backgroundColor = settingsObj.rainbowColor;
 }
 
-// Does not work optimally, when mouseenter is followed by mousedown
 function useActiveTool(event) {
 	const el = event.currentTarget;
 	if (!settingsObj.clickOn) {
@@ -74,6 +81,14 @@ function useActiveTool(event) {
 	} else if (event.buttons === 1) {
 		settingsObj.activeTool(el);
 	}
+}
+
+function pipettePixel(el) {
+	// Pick color of clicked element (Maybe use changeColor)
+}
+
+function changeColor(el) {
+	// OnChange of color picker to change settingsObj color
 }
 
 function clearGrid() {
@@ -84,13 +99,3 @@ function clearGrid() {
 function toggleGrid() {
 	etchContainer.style.gap = etchContainer.style.gap === "0px" ? "1px" : "0px";
 }
-
-// Pick color
-
-// Opacity mode
-
-// Grid on or off
-
-// Fill tool
-
-// Color pipette
