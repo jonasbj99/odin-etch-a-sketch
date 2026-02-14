@@ -1,15 +1,11 @@
 const etchContainer = document.querySelector('[class^="etch-container"]');
 
-let mouseDown = false;
-document.addEventListener("mousedown", () => (mouseDown = true));
-document.addEventListener("mouseup", () => (mouseDown = false));
-
 // Default settings
 const settingsObj = {
 	color: "#000",
 	rainbowColor: "#fff",
 	size: 16,
-	clickOn: true,
+	clickOn: false,
 	activeTool: colorPixel,
 };
 
@@ -41,6 +37,7 @@ function generateGrid(size) {
 			newEl.classList.add("etch-pixel");
 
 			newEl.addEventListener("mouseenter", useActiveTool);
+			newEl.addEventListener("mousedown", useActiveTool);
 
 			newRow.appendChild(newEl);
 		}
@@ -49,7 +46,6 @@ function generateGrid(size) {
 	}
 }
 
-// Change tool function instead of if/else statements
 function colorPixel(el) {
 	el.style.backgroundColor = settingsObj.color;
 }
@@ -66,12 +62,19 @@ function rainbowPixel(el) {
 	el.style.backgroundColor = settingsObj.rainbowColor;
 }
 
+function darkenPixel(el) {}
+
+function lightenPixel(el) {}
+
+function fillPixels(el) {}
+
+function pipettePixel(el) {}
+
 function clearGrid() {
 	const children = etchContainer.querySelectorAll(".etch-pixel");
 	children.forEach((child) => child.removeAttribute("style"));
 }
 
-// Does not work optimally, when mouseenter is followed by mousedown
 function useActiveTool(event) {
 	const el = event.currentTarget;
 	if (!settingsObj.clickOn) {
@@ -92,12 +95,6 @@ function changeTool(func = settingsObj.activeTool) {
 	});
 }
 
-// Pick color
-
-// Opacity mode
-
-// Grid on or off
-
-// Fill tool
-
-// Color pipette
+function toggleGrid() {
+	etchContainer.style.gap = etchContainer.style.gap === "0px" ? "1px" : "0px";
+}
