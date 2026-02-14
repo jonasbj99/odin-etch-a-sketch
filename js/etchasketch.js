@@ -9,7 +9,7 @@ const settingsObj = {
 	color: "#000",
 	rainbowColor: "#fff",
 	size: 16,
-	clickOn: true,
+	clickOn: false,
 	activeTool: colorPixel,
 };
 
@@ -41,6 +41,7 @@ function generateGrid(size) {
 			newEl.classList.add("etch-pixel");
 
 			newEl.addEventListener("mouseenter", useActiveTool);
+			newEl.addEventListener("mousedown", useActiveTool);
 
 			newRow.appendChild(newEl);
 		}
@@ -79,17 +80,6 @@ function useActiveTool(event) {
 	} else if (event.buttons === 1) {
 		settingsObj.activeTool(el);
 	}
-}
-
-// Potentially remove
-function changeTool(func = settingsObj.activeTool) {
-	settingsObj.activeTool = func;
-	const children = etchContainer.querySelectorAll(".etch-pixel");
-	children.forEach((child) => {
-		// Replace to clear event listeners
-		child.replaceWith(child.cloneNode(true));
-		child.addEventListener("mouseenter", func);
-	});
 }
 
 // Pick color
