@@ -1,12 +1,16 @@
 const etchContainer = document.querySelector('[class^="etch-container"]');
 
+let mouseDown = false;
+document.addEventListener("mousedown", () => (mouseDown = true));
+document.addEventListener("mouseup", () => (mouseDown = false));
+
 // Default settings
 const settingsObj = {
 	color: "#000",
+	rainbowColor: "#fff",
 	size: 16,
-	eraserOn: false,
-	clickOn: false,
-	rainbowOn: false,
+	clickOn: true,
+	activeTool: colorPixel,
 };
 
 generateGrid(settingsObj.size);
@@ -36,11 +40,8 @@ function generateGrid(size) {
 			newEl.setAttribute("id", `${i}-${j}`);
 			newEl.classList.add("etch-pixel");
 
-			if (settingsObj.clickOn) {
-				newEl.addEventListener("click", colorPixel);
-			} else {
-				newEl.addEventListener("mouseenter", colorPixel);
-			}
+			newEl.addEventListener("mouseenter", useActiveTool);
+
 			newRow.appendChild(newEl);
 		}
 
@@ -49,31 +50,49 @@ function generateGrid(size) {
 }
 
 // Change tool function instead of if/else statements
-function colorPixel(event) {
-	const el = event.currentTarget;
+function colorPixel(el) {
+	el.style.backgroundColor = settingsObj.color;
+}
 
-	if (settingsObj.eraserOn) {
-		el.removeAttribute("style");
-	} else {
-		if (settingsObj.rainbowOn) {
-			const rNum = Math.floor(Math.random() * 255);
-			const gNum = Math.floor(Math.random() * 255);
-			const bNum = Math.floor(Math.random() * 255);
-			settingsObj.color = `rgb(${rNum}, ${gNum}, ${bNum})`;
-		}
+function erasePixel(el) {
+	el.removeAttribute("style");
+}
 
-		el.style.backgroundColor = settingsObj.color;
-	}
+function rainbowPixel(el) {
+	const rNum = Math.floor(Math.random() * 255);
+	const gNum = Math.floor(Math.random() * 255);
+	const bNum = Math.floor(Math.random() * 255);
+	settingsObj.rainbowColor = `rgb(${rNum}, ${gNum}, ${bNum})`;
+	el.style.backgroundColor = settingsObj.rainbowColor;
 }
 
 function clearGrid() {
-	const children = etchContainer.querySelectorAll("*");
+	const children = etchContainer.querySelectorAll(".etch-pixel");
 	children.forEach((child) => child.removeAttribute("style"));
 }
 
-// Pick color
+// Does not work optimally, when mouseenter is followed by mousedown
+function useActiveTool(event) {
+	const el = event.currentTarget;
+	if (!settingsObj.clickOn) {
+		settingsObj.activeTool(el);
+	} else if (event.buttons === 1) {
+		settingsObj.activeTool(el);
+	}
+}
 
-// Erase
+// Potentially remove
+function changeTool(func = settingsObj.activeTool) {
+	settingsObj.activeTool = func;
+	const children = etchContainer.querySelectorAll(".etch-pixel");
+	children.forEach((child) => {
+		// Replace to clear event listeners
+		child.replaceWith(child.cloneNode(true));
+		child.addEventListener("mouseenter", func);
+	});
+}
+
+// Pick color
 
 // Opacity mode
 
