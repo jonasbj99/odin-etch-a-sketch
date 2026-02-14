@@ -1,64 +1,74 @@
 const etchContainer = document.querySelector('[class^="etch-container"]');
 
+// Default settings
 const settingsObj = {
-  color: "#000",
-  size: 16,
-  clickOn: false,
-  rainbowOn: true,
+	color: "#000",
+	size: 16,
+	eraserOn: false,
+	clickOn: false,
+	rainbowOn: false,
 };
 
 generateGrid(settingsObj.size);
 
+// ?!? Consider saving pixels when changing size
 function generateGrid(size) {
-  // Clear existing grid
-  const children = etchContainer.querySelectorAll("*");
-  children.forEach((child) => child.remove());
+	// Clear existing grid
+	const children = etchContainer.querySelectorAll("*");
+	children.forEach((child) => child.remove());
 
-  // Remove any existing grid size class
-  etchContainer.classList.forEach((className) => {
-    if (className.startsWith("etch-container")) {
-      etchContainer.classList.remove(className);
-    }
-  });
+	// Remove any existing grid size class
+	etchContainer.classList.forEach((className) => {
+		if (className.startsWith("etch-container")) {
+			etchContainer.classList.remove(className);
+		}
+	});
 
-  etchContainer.classList.add(`etch-container-${size}`);
+	etchContainer.classList.add(`etch-container-${size}`);
 
-  // Add new grid children based on size
-  for (let i = 1; i <= size; i++) {
-    const newRow = document.createElement("div");
-    newRow.classList.add("etch-row");
+	// Add new grid children based on size x size
+	for (let i = 1; i <= size; i++) {
+		const newRow = document.createElement("div");
+		newRow.classList.add("etch-row");
 
-    for (let j = 1; j <= size; j++) {
-      const newEl = document.createElement("div");
-      newEl.setAttribute("id", `${i}-${j}`);
-      newEl.classList.add("etch-pixel");
+		for (let j = 1; j <= size; j++) {
+			const newEl = document.createElement("div");
+			newEl.setAttribute("id", `${i}-${j}`);
+			newEl.classList.add("etch-pixel");
 
-      if (settingsObj.clickOn) {
-        newEl.addEventListener("click", colorPixel);
-      } else {
-        newEl.addEventListener("mouseenter", colorPixel);
-      }
-      newRow.appendChild(newEl);
-    }
+			if (settingsObj.clickOn) {
+				newEl.addEventListener("click", colorPixel);
+			} else {
+				newEl.addEventListener("mouseenter", colorPixel);
+			}
+			newRow.appendChild(newEl);
+		}
 
-    etchContainer.appendChild(newRow);
-  }
+		etchContainer.appendChild(newRow);
+	}
 }
 
+// Change tool function instead of if/else statements
 function colorPixel(event) {
-  if (settingsObj.rainbowOn) {
-    const rNum = Math.floor(Math.random() * 255);
-    const gNum = Math.floor(Math.random() * 255);
-    const bNum = Math.floor(Math.random() * 255);
-    settingsObj.color = `rgb(${rNum}, ${gNum}, ${bNum})`;
-  }
-  const el = event.currentTarget;
-  el.style.backgroundColor = settingsObj.color;
+	const el = event.currentTarget;
+
+	if (settingsObj.eraserOn) {
+		el.removeAttribute("style");
+	} else {
+		if (settingsObj.rainbowOn) {
+			const rNum = Math.floor(Math.random() * 255);
+			const gNum = Math.floor(Math.random() * 255);
+			const bNum = Math.floor(Math.random() * 255);
+			settingsObj.color = `rgb(${rNum}, ${gNum}, ${bNum})`;
+		}
+
+		el.style.backgroundColor = settingsObj.color;
+	}
 }
 
 function clearGrid() {
-  const children = etchContainer.querySelectorAll("*");
-  children.forEach((child) => child.removeAttribute("style"));
+	const children = etchContainer.querySelectorAll("*");
+	children.forEach((child) => child.removeAttribute("style"));
 }
 
 // Pick color
@@ -66,3 +76,9 @@ function clearGrid() {
 // Erase
 
 // Opacity mode
+
+// Grid on or off
+
+// Fill tool
+
+// Color pipette
