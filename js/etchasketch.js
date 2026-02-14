@@ -50,7 +50,6 @@ function generateGrid(size) {
 	}
 }
 
-// Change tool function instead of if/else statements
 function colorPixel(el) {
 	el.style.backgroundColor = settingsObj.color;
 }
@@ -67,11 +66,6 @@ function rainbowPixel(el) {
 	el.style.backgroundColor = settingsObj.rainbowColor;
 }
 
-function clearGrid() {
-	const children = etchContainer.querySelectorAll(".etch-pixel");
-	children.forEach((child) => child.removeAttribute("style"));
-}
-
 // Does not work optimally, when mouseenter is followed by mousedown
 function useActiveTool(event) {
 	const el = event.currentTarget;
@@ -80,6 +74,15 @@ function useActiveTool(event) {
 	} else if (event.buttons === 1) {
 		settingsObj.activeTool(el);
 	}
+}
+
+function clearGrid() {
+	const children = etchContainer.querySelectorAll(".etch-pixel");
+	children.forEach((child) => child.removeAttribute("style"));
+}
+
+function toggleGrid() {
+	etchContainer.style.gap = etchContainer.style.gap === "0px" ? "1px" : "0px";
 }
 
 // Pick color
