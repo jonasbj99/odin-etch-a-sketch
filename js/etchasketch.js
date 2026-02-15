@@ -12,7 +12,7 @@ const settingsObj = {
 	color: "#000000",
 	rainbowColor: "#ffffff",
 	size: 16,
-	clickOn: false,
+	clickOn: true,
 	activeTool: colorPixel,
 };
 
@@ -89,7 +89,7 @@ function useActiveTool(event) {
 }
 
 function pipettePixel(el) {
-	const color = el.style.backgroundColor;
+	const color = getComputedStyle(el).backgroundColor;
 	changeColor(color);
 }
 
