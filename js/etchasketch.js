@@ -24,6 +24,8 @@ generateGrid(settingsObj.size);
 
 // ?!? Consider saving pixels when changing size
 function generateGrid(size) {
+	settingsObj.size = size;
+
 	// Clear existing grid
 	const children = etchContainer.querySelectorAll("*");
 	children.forEach((child) => child.remove());
@@ -44,7 +46,7 @@ function generateGrid(size) {
 
 		for (let j = 1; j <= size; j++) {
 			const newEl = document.createElement("div");
-			newEl.setAttribute("id", `${i}-${j}`);
+			newEl.setAttribute("id", `p${i}-${j}`);
 			newEl.classList.add("etch-pixel");
 
 			newEl.addEventListener("mouseenter", useActiveTool);
@@ -86,7 +88,30 @@ function lightenPixel(el) {
 }
 
 function fillPixels(el) {
-	// Fill pixel and any adjacent pixels with same background color value
+	const id = el.id.slice(1).split("-");
+	const y = +id[0];
+	const x = +id[1];
+	const currentBg = convertToHex(getComputedStyle(el).backgroundColor);
+
+	if (currentBg === settingsObj.color) {
+		return;
+	} else {
+		el.style.backgroundColor = settingsObj.color;
+
+		let adjacent = [];
+		// Add adjacent pixels within grid bounds
+		if (x < settingsObj.size) adjacent.push(`#p${y}-${x + 1}`);
+		if (x > 1) adjacent.push(`#p${y}-${x - 1}`);
+		if (y < settingsObj.size) adjacent.push(`#p${y + 1}-${x}`);
+		if (y > 1) adjacent.push(`#p${+y - 1}-${x}`);
+
+		// Call function on adjacent pixels with same background color
+		adjacent.forEach((id) => {
+			const adjEl = document.querySelector(id);
+			const adjBg = convertToHex(getComputedStyle(adjEl).backgroundColor);
+			if (currentBg === adjBg) fillPixels(adjEl);
+		});
+	}
 }
 
 function rainbowPixel(el) {
@@ -101,7 +126,7 @@ function rainbowPixel(el) {
 function useActiveTool(event) {
 	const el = event.currentTarget;
 	const tool = settingsObj.activeTool;
-	if (!settingsObj.clickOn && tool != pipettePixel) {
+	if (!settingsObj.clickOn && tool != pipettePixel && tool != fillPixels) {
 		settingsObj.activeTool(el);
 	} else if (event.buttons === 1) {
 		settingsObj.activeTool(el);
