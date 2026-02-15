@@ -73,7 +73,9 @@ function lightenPixel(el) {
 	// Lighten color of drawn pixel
 }
 
-function fillPixels(el) {}
+function fillPixels(el) {
+	// Fill pixel and any adjacent pixels with same background color value
+}
 
 function rainbowPixel(el) {
 	const rNum = Math.floor(Math.random() * 255);
