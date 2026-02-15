@@ -142,7 +142,6 @@ function changeColor(color) {
 	const converted = convertToHex(color);
 	settingsObj.color = converted;
 	colorChanger.value = converted;
-	console.log(hexToHsl(converted));
 }
 
 function clearGrid() {
