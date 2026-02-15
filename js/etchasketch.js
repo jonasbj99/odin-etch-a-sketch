@@ -66,11 +66,23 @@ function erasePixel(el) {
 }
 
 function darkenPixel(el) {
-	// Darken color of drawn pixel
+	const rgb = getComputedStyle(el).backgroundColor;
+	const hsl = hexToHsl(convertToHex(rgb));
+	let h = hsl[0];
+	let s = hsl[1];
+	// Subtract 10% lightness, limited to 0
+	let l = hsl[2] - 10 <= 0 ? 0 : hsl[2] - 10;
+	el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 function lightenPixel(el) {
-	// Lighten color of drawn pixel
+	const rgb = getComputedStyle(el).backgroundColor;
+	const hsl = hexToHsl(convertToHex(rgb));
+	let h = hsl[0];
+	let s = hsl[1];
+	// Add 10% lightness, limited to 100
+	let l = hsl[2] + 10 >= 100 ? 100 : hsl[2] + 10;
+	el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 function fillPixels(el) {
@@ -105,6 +117,7 @@ function changeColor(color) {
 	const converted = convertToHex(color);
 	settingsObj.color = converted;
 	colorChanger.value = converted;
+	console.log(hexToHsl(converted));
 }
 
 function clearGrid() {
@@ -133,4 +146,51 @@ function convertToHex(color) {
 	const b = parseInt(rgb[2]).toString(16).padStart(2, "0");
 
 	return `#${r}${g}${b}`;
+}
+
+function hexToHsl(hex) {
+	// Hex to r, g, and b
+	let r = parseInt(hex.substr(1, 2), 16);
+	let g = parseInt(hex.substr(3, 2), 16);
+	let b = parseInt(hex.substr(5, 2), 16);
+
+	// Convert rgb ranges from 0-255 to 0-1
+	const rgb = ((r /= 255), (g /= 255), (b /= 255));
+
+	// Strongest and weakest color channel
+	const max = Math.max(r, g, b),
+		min = Math.min(r, g, b);
+
+	// Define hue and saturation, calculate lightness
+	let h,
+		s,
+		l = (max + min) / 2;
+
+	if (max === min) {
+		// Achromatic/gray
+		h = s = 0;
+	} else {
+		const d = max - min;
+		// Calculate saturation
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+		// Calculate hue based on strongest rgb channel
+		switch (max) {
+			case r:
+				h = (g - b) / d + (g < b ? 6 : 0);
+				break;
+			case g:
+				h = (b - r) / d + 2;
+				break;
+			case b:
+				h = (r - g) / d + 4;
+				break;
+		}
+
+		// Convert range from 0-6 to 0-1
+		h /= 6;
+	}
+
+	// Convert to CSS ranges and return
+	return [h * 360, s * 100, l * 100];
 }
