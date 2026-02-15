@@ -1,13 +1,16 @@
+// Grid container
 const etchContainer = document.querySelector('[class^="etch-container"]');
 
-let mouseDown = false;
-document.addEventListener("mousedown", () => (mouseDown = true));
-document.addEventListener("mouseup", () => (mouseDown = false));
+// Settings elements
+const colorChanger = document.querySelector("#colorChanger");
+colorChanger.addEventListener("change", (event) => {
+	changeColor(event.target.value);
+});
 
 // Default settings
 const settingsObj = {
-	color: "#000",
-	rainbowColor: "#fff",
+	color: "#000000",
+	rainbowColor: "#ffffff",
 	size: 16,
 	clickOn: false,
 	activeTool: colorPixel,
@@ -66,6 +69,8 @@ function lightenPixel(el) {
 	// Lighten color of drawn pixel
 }
 
+function fillPixels(el) {}
+
 function rainbowPixel(el) {
 	const rNum = Math.floor(Math.random() * 255);
 	const gNum = Math.floor(Math.random() * 255);
@@ -84,11 +89,14 @@ function useActiveTool(event) {
 }
 
 function pipettePixel(el) {
-	// Pick color of clicked element (Maybe use changeColor)
+	const color = el.style.backgroundColor;
+	changeColor(color);
 }
 
-function changeColor(el) {
-	// OnChange of color picker to change settingsObj color
+function changeColor(color) {
+	const converted = convertToHex(color);
+	settingsObj.color = converted;
+	colorChanger.value = converted;
 }
 
 function clearGrid() {
@@ -98,4 +106,23 @@ function clearGrid() {
 
 function toggleGrid() {
 	etchContainer.style.gap = etchContainer.style.gap === "0px" ? "1px" : "0px";
+}
+
+function convertToHex(color) {
+	// Temporary element to get computed style in hex format
+	const temp = document.createElement("div");
+	temp.style.color = color;
+	document.body.appendChild(temp);
+
+	const computed = getComputedStyle(temp).color;
+	document.body.removeChild(temp);
+
+	// Computed will now be rgb(...) or rgba(...)
+	const rgb = computed.match(/\d+/g);
+
+	const r = parseInt(rgb[0]).toString(16).padStart(2, "0");
+	const g = parseInt(rgb[1]).toString(16).padStart(2, "0");
+	const b = parseInt(rgb[2]).toString(16).padStart(2, "0");
+
+	return `#${r}${g}${b}`;
 }
