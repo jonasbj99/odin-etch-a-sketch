@@ -7,6 +7,10 @@ colorChanger.addEventListener("change", (event) => {
 	changeColor(event.target.value);
 });
 
+let mouseDown = false;
+document.addEventListener("mousedown", () => (mouseDown = true));
+document.addEventListener("mouseup", () => (mouseDown = false));
+
 // Default settings
 const settingsObj = {
 	color: "#000000",
@@ -79,9 +83,11 @@ function rainbowPixel(el) {
 	el.style.backgroundColor = settingsObj.rainbowColor;
 }
 
+// ?!? Consider different solution for pipette
 function useActiveTool(event) {
 	const el = event.currentTarget;
-	if (!settingsObj.clickOn) {
+	const tool = settingsObj.activeTool;
+	if (!settingsObj.clickOn && tool != pipettePixel) {
 		settingsObj.activeTool(el);
 	} else if (event.buttons === 1) {
 		settingsObj.activeTool(el);
@@ -117,7 +123,7 @@ function convertToHex(color) {
 	const computed = getComputedStyle(temp).color;
 	document.body.removeChild(temp);
 
-	// Computed will now be rgb(...) or rgba(...)
+	// Computed to rgb/rgba to hex
 	const rgb = computed.match(/\d+/g);
 
 	const r = parseInt(rgb[0]).toString(16).padStart(2, "0");
