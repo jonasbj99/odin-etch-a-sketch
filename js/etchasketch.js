@@ -87,6 +87,9 @@ function lightenPixel(el) {
 	el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
 }
 
+// !!! Problem with large pixel areas due to call stack issues
+// !!! Consider while loop and storing adjacent same color pixels
+// !!! Then revisiting pixels later to avoid call backs
 function fillPixels(el) {
 	const id = el.id.slice(1).split("-");
 	const y = +id[0];
