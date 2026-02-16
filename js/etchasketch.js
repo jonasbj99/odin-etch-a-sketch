@@ -88,8 +88,8 @@ function lightenPixel(el) {
 }
 
 // !!! Problem with large pixel areas due to call stack issues
-// !!! Consider while loop and storing adjacent same color pixels
-// !!! Then revisiting pixels later to avoid call backs
+// !!! Consider while looping horizontally saving same color pixels to array
+// !!! Then loop vertically finding the rest of the connected pixels
 function fillPixels(el) {
 	const id = el.id.slice(1).split("-");
 	const y = +id[0];
