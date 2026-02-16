@@ -39,6 +39,10 @@
 	padding: 10px;
 	border-radius: 10px;
 	background-color: var(--prim-col);
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
 
 	.etch-row {
 		display: flex;
