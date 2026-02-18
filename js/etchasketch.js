@@ -108,50 +108,6 @@ function fillPixels(el) {
   }
 }
 
-function fillPixelsAlt(el) {
-  const fillBg = convertToHex(getComputedStyle(el).backgroundColor);
-
-  if (fillBg === settingsObj.color) {
-    return;
-  } else {
-    let fillArr = [];
-    const start = el.id.slice(1).split("-");
-    fillArr.push(start);
-
-    const directions = [
-      [0, 1],
-      [0, -1],
-      [1, 0],
-      [-1, 0],
-    ];
-
-    directions.forEach((dir) => {
-      let keepGoing = true;
-      let newId = [+start[0], +start[1]];
-
-      while (keepGoing) {
-        newId[0] += dir[0];
-        newId[1] += dir[1];
-        const rInRange = newId[0] >= 1 && newId[0] <= settingsObj.size;
-        const cInRange = newId[1] >= 1 && newId[1] <= settingsObj.size;
-
-        if (rInRange && cInRange) {
-          const newEl = document.querySelector(arrayToId(newId));
-          const newBg = convertToHex(getComputedStyle(newEl).backgroundColor);
-
-          if (newBg === fillBg) {
-            fillArr.push(newId);
-          }
-        } else {
-          keepGoing = false;
-        }
-      }
-    });
-
-    fillArr.forEach((arr) => console.log(arrayToId(arr)));
-  }
-}
-
 function arrayToId(arr) {
   return `#p${arr[0]}-${arr[1]}`;
 }
