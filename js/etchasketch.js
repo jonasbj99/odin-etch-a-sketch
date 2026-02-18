@@ -1,10 +1,10 @@
 // Grid container
-const etchContainer = document.querySelector('[class^="etch-container"]');
+const etchContainer = document.querySelector(".etch-container");
 
 // Settings elements
 const colorChanger = document.querySelector("#colorChanger");
 colorChanger.addEventListener("change", (event) => {
-	changeColor(event.target.value);
+  changeColor(event.target.value);
 });
 
 let mouseDown = false;
@@ -13,259 +13,250 @@ document.addEventListener("mouseup", () => (mouseDown = false));
 
 // Default settings
 const settingsObj = {
-	color: "#000000",
-	rainbowColor: "#ffffff",
-	size: 16,
-	clickOn: true,
-	activeTool: colorPixel,
+  color: "#000000",
+  rainbowColor: "#ffffff",
+  size: 16,
+  clickOn: true,
+  activeTool: colorPixel,
 };
 
 generateGrid(settingsObj.size);
 
 // ?!? Consider saving pixels when changing size
 function generateGrid(size) {
-	settingsObj.size = size;
+  settingsObj.size = size;
 
-	// Clear existing grid
-	const children = etchContainer.querySelectorAll("*");
-	children.forEach((child) => child.remove());
+  // Clear existing grid
+  const children = etchContainer.querySelectorAll("*");
+  children.forEach((child) => child.remove());
 
-	// Remove any existing grid size class
-	etchContainer.classList.forEach((className) => {
-		if (className.startsWith("etch-container")) {
-			etchContainer.classList.remove(className);
-		}
-	});
+  // Add new grid children based on size x size
+  for (let i = 1; i <= size; i++) {
+    const newRow = document.createElement("div");
+    newRow.classList.add("etch-row");
 
-	etchContainer.classList.add(`etch-container-${size}`);
+    for (let j = 1; j <= size; j++) {
+      const newEl = document.createElement("div");
+      newEl.setAttribute("id", `p${i}-${j}`);
+      newEl.classList.add("etch-pixel");
 
-	// Add new grid children based on size x size
-	for (let i = 1; i <= size; i++) {
-		const newRow = document.createElement("div");
-		newRow.classList.add("etch-row");
+      newEl.addEventListener("mouseenter", useActiveTool);
+      newEl.addEventListener("mousedown", useActiveTool);
 
-		for (let j = 1; j <= size; j++) {
-			const newEl = document.createElement("div");
-			newEl.setAttribute("id", `p${i}-${j}`);
-			newEl.classList.add("etch-pixel");
+      newRow.appendChild(newEl);
+    }
 
-			newEl.addEventListener("mouseenter", useActiveTool);
-			newEl.addEventListener("mousedown", useActiveTool);
-
-			newRow.appendChild(newEl);
-		}
-
-		etchContainer.appendChild(newRow);
-	}
+    etchContainer.appendChild(newRow);
+  }
 }
 
 function colorPixel(el) {
-	el.style.backgroundColor = settingsObj.color;
+  el.style.backgroundColor = settingsObj.color;
 }
 
 function erasePixel(el) {
-	el.removeAttribute("style");
+  el.removeAttribute("style");
 }
 
 function darkenPixel(el) {
-	const rgb = getComputedStyle(el).backgroundColor;
-	const hsl = hexToHsl(convertToHex(rgb));
-	let h = hsl[0];
-	let s = hsl[1];
-	// Subtract 10% lightness, limited to 0
-	let l = hsl[2] - 10 <= 0 ? 0 : hsl[2] - 10;
-	el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+  const rgb = getComputedStyle(el).backgroundColor;
+  const hsl = hexToHsl(convertToHex(rgb));
+  let h = hsl[0];
+  let s = hsl[1];
+  // Subtract 10% lightness, limited to 0
+  let l = hsl[2] - 10 <= 0 ? 0 : hsl[2] - 10;
+  el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 function lightenPixel(el) {
-	const rgb = getComputedStyle(el).backgroundColor;
-	const hsl = hexToHsl(convertToHex(rgb));
-	let h = hsl[0];
-	let s = hsl[1];
-	// Add 10% lightness, limited to 100
-	let l = hsl[2] + 10 >= 100 ? 100 : hsl[2] + 10;
-	el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+  const rgb = getComputedStyle(el).backgroundColor;
+  const hsl = hexToHsl(convertToHex(rgb));
+  let h = hsl[0];
+  let s = hsl[1];
+  // Add 10% lightness, limited to 100
+  let l = hsl[2] + 10 >= 100 ? 100 : hsl[2] + 10;
+  el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 // !!! Problem with large pixel areas due to call stack issues
 // !!! Consider while looping horizontally saving same color pixels to array
 // !!! Then loop vertically finding the rest of the connected pixels
 function fillPixels(el) {
-	const id = el.id.slice(1).split("-");
-	const y = +id[0];
-	const x = +id[1];
-	const currentBg = convertToHex(getComputedStyle(el).backgroundColor);
+  const id = el.id.slice(1).split("-");
+  const y = +id[0];
+  const x = +id[1];
+  const currentBg = convertToHex(getComputedStyle(el).backgroundColor);
 
-	if (currentBg === settingsObj.color) {
-		return;
-	} else {
-		el.style.backgroundColor = settingsObj.color;
+  if (currentBg === settingsObj.color) {
+    return;
+  } else {
+    el.style.backgroundColor = settingsObj.color;
 
-		let adjacent = [];
-		// Add adjacent pixels within grid bounds
-		if (x < settingsObj.size) adjacent.push(`#p${y}-${x + 1}`);
-		if (x > 1) adjacent.push(`#p${y}-${x - 1}`);
-		if (y < settingsObj.size) adjacent.push(`#p${y + 1}-${x}`);
-		if (y > 1) adjacent.push(`#p${+y - 1}-${x}`);
+    let adjacent = [];
+    // Add adjacent pixels within grid bounds
+    if (x < settingsObj.size) adjacent.push(`#p${y}-${x + 1}`);
+    if (x > 1) adjacent.push(`#p${y}-${x - 1}`);
+    if (y < settingsObj.size) adjacent.push(`#p${y + 1}-${x}`);
+    if (y > 1) adjacent.push(`#p${+y - 1}-${x}`);
 
-		// Call function on adjacent pixels with same background color
-		adjacent.forEach((id) => {
-			const adjEl = document.querySelector(id);
-			const adjBg = convertToHex(getComputedStyle(adjEl).backgroundColor);
-			if (currentBg === adjBg) fillPixels(adjEl);
-		});
-	}
+    // Call function on adjacent pixels with same background color
+    adjacent.forEach((id) => {
+      const adjEl = document.querySelector(id);
+      const adjBg = convertToHex(getComputedStyle(adjEl).backgroundColor);
+      if (currentBg === adjBg) fillPixels(adjEl);
+    });
+  }
 }
 
 function fillPixelsAlt(el) {
-	const fillBg = convertToHex(getComputedStyle(el).backgroundColor);
+  const fillBg = convertToHex(getComputedStyle(el).backgroundColor);
 
-	if (fillBg === settingsObj.color) {
-		return;
-	} else {
-		let fillArr = [];
-		const start = el.id.slice(1).split("-");
-		fillArr.push(start);
+  if (fillBg === settingsObj.color) {
+    return;
+  } else {
+    let fillArr = [];
+    const start = el.id.slice(1).split("-");
+    fillArr.push(start);
 
-		const directions = [
-			[0, 1],
-			[0, -1],
-			[1, 0],
-			[-1, 0],
-		];
+    const directions = [
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [-1, 0],
+    ];
 
-		directions.forEach((dir) => {
-			let keepGoing = true;
-			let newId = [+start[0], +start[1]];
+    directions.forEach((dir) => {
+      let keepGoing = true;
+      let newId = [+start[0], +start[1]];
 
-			while (keepGoing) {
-				newId[0] += dir[0];
-				newId[1] += dir[1];
-				const rInRange = newId[0] >= 1 && newId[0] <= settingsObj.size;
-				const cInRange = newId[1] >= 1 && newId[1] <= settingsObj.size;
+      while (keepGoing) {
+        newId[0] += dir[0];
+        newId[1] += dir[1];
+        const rInRange = newId[0] >= 1 && newId[0] <= settingsObj.size;
+        const cInRange = newId[1] >= 1 && newId[1] <= settingsObj.size;
 
-				if (rInRange && cInRange) {
-					const newEl = document.querySelector(arrayToId(newId));
-					const newBg = convertToHex(getComputedStyle(newEl).backgroundColor);
+        if (rInRange && cInRange) {
+          const newEl = document.querySelector(arrayToId(newId));
+          const newBg = convertToHex(getComputedStyle(newEl).backgroundColor);
 
-					if (newBg === fillBg) {
-						fillArr.push(newId);
-					}
-				} else {
-					keepGoing = false;
-				}
-			}
-		});
+          if (newBg === fillBg) {
+            fillArr.push(newId);
+          }
+        } else {
+          keepGoing = false;
+        }
+      }
+    });
 
-		fillArr.forEach((arr) => console.log(arrayToId(arr)));
-	}
+    fillArr.forEach((arr) => console.log(arrayToId(arr)));
+  }
 }
 
 function arrayToId(arr) {
-	return `#p${arr[0]}-${arr[1]}`;
+  return `#p${arr[0]}-${arr[1]}`;
 }
 
 function rainbowPixel(el) {
-	const rNum = Math.floor(Math.random() * 255);
-	const gNum = Math.floor(Math.random() * 255);
-	const bNum = Math.floor(Math.random() * 255);
-	settingsObj.rainbowColor = `rgb(${rNum}, ${gNum}, ${bNum})`;
-	el.style.backgroundColor = settingsObj.rainbowColor;
+  const rNum = Math.floor(Math.random() * 255);
+  const gNum = Math.floor(Math.random() * 255);
+  const bNum = Math.floor(Math.random() * 255);
+  settingsObj.rainbowColor = `rgb(${rNum}, ${gNum}, ${bNum})`;
+  el.style.backgroundColor = settingsObj.rainbowColor;
 }
 
 // ?!? Consider different solution for pipette
 function useActiveTool(event) {
-	const el = event.currentTarget;
-	const tool = settingsObj.activeTool;
-	if (!settingsObj.clickOn && tool != pipettePixel && tool != fillPixels) {
-		settingsObj.activeTool(el);
-	} else if (event.buttons === 1) {
-		settingsObj.activeTool(el);
-	}
+  const el = event.currentTarget;
+  const tool = settingsObj.activeTool;
+  if (!settingsObj.clickOn && tool != pipettePixel && tool != fillPixels) {
+    settingsObj.activeTool(el);
+  } else if (event.buttons === 1) {
+    settingsObj.activeTool(el);
+  }
 }
 
 function pipettePixel(el) {
-	const color = getComputedStyle(el).backgroundColor;
-	changeColor(color);
+  const color = getComputedStyle(el).backgroundColor;
+  changeColor(color);
 }
 
 function changeColor(color) {
-	const converted = convertToHex(color);
-	settingsObj.color = converted;
-	colorChanger.value = converted;
+  const converted = convertToHex(color);
+  settingsObj.color = converted;
+  colorChanger.value = converted;
 }
 
 function clearGrid() {
-	const children = etchContainer.querySelectorAll(".etch-pixel");
-	children.forEach((child) => child.removeAttribute("style"));
+  const children = etchContainer.querySelectorAll(".etch-pixel");
+  children.forEach((child) => child.removeAttribute("style"));
 }
 
 function toggleGrid() {
-	etchContainer.style.gap = etchContainer.style.gap === "0px" ? "1px" : "0px";
+  etchContainer.style.gap = etchContainer.style.gap === "0px" ? "1px" : "0px";
 }
 
 function convertToHex(color) {
-	// Temporary element to get computed style in hex format
-	const temp = document.createElement("div");
-	temp.style.color = color;
-	document.body.appendChild(temp);
+  // Temporary element to get computed style in hex format
+  const temp = document.createElement("div");
+  temp.style.color = color;
+  document.body.appendChild(temp);
 
-	const computed = getComputedStyle(temp).color;
-	document.body.removeChild(temp);
+  const computed = getComputedStyle(temp).color;
+  document.body.removeChild(temp);
 
-	// Computed to rgb/rgba to hex
-	const rgb = computed.match(/\d+/g);
+  // Computed to rgb/rgba to hex
+  const rgb = computed.match(/\d+/g);
 
-	const r = parseInt(rgb[0]).toString(16).padStart(2, "0");
-	const g = parseInt(rgb[1]).toString(16).padStart(2, "0");
-	const b = parseInt(rgb[2]).toString(16).padStart(2, "0");
+  const r = parseInt(rgb[0]).toString(16).padStart(2, "0");
+  const g = parseInt(rgb[1]).toString(16).padStart(2, "0");
+  const b = parseInt(rgb[2]).toString(16).padStart(2, "0");
 
-	return `#${r}${g}${b}`;
+  return `#${r}${g}${b}`;
 }
 
 function hexToHsl(hex) {
-	// Hex to r, g, and b
-	let r = parseInt(hex.substr(1, 2), 16);
-	let g = parseInt(hex.substr(3, 2), 16);
-	let b = parseInt(hex.substr(5, 2), 16);
+  // Hex to r, g, and b
+  let r = parseInt(hex.substr(1, 2), 16);
+  let g = parseInt(hex.substr(3, 2), 16);
+  let b = parseInt(hex.substr(5, 2), 16);
 
-	// Convert rgb ranges from 0-255 to 0-1
-	const rgb = ((r /= 255), (g /= 255), (b /= 255));
+  // Convert rgb ranges from 0-255 to 0-1
+  const rgb = ((r /= 255), (g /= 255), (b /= 255));
 
-	// Strongest and weakest color channel
-	const max = Math.max(r, g, b),
-		min = Math.min(r, g, b);
+  // Strongest and weakest color channel
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
 
-	// Define hue and saturation, calculate lightness
-	let h,
-		s,
-		l = (max + min) / 2;
+  // Define hue and saturation, calculate lightness
+  let h,
+    s,
+    l = (max + min) / 2;
 
-	if (max === min) {
-		// Achromatic/gray
-		h = s = 0;
-	} else {
-		const d = max - min;
-		// Calculate saturation
-		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  if (max === min) {
+    // Achromatic/gray
+    h = s = 0;
+  } else {
+    const d = max - min;
+    // Calculate saturation
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
-		// Calculate hue based on strongest rgb channel
-		switch (max) {
-			case r:
-				h = (g - b) / d + (g < b ? 6 : 0);
-				break;
-			case g:
-				h = (b - r) / d + 2;
-				break;
-			case b:
-				h = (r - g) / d + 4;
-				break;
-		}
+    // Calculate hue based on strongest rgb channel
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
 
-		// Convert range from 0-6 to 0-1
-		h /= 6;
-	}
+    // Convert range from 0-6 to 0-1
+    h /= 6;
+  }
 
-	// Convert to CSS ranges and return
-	return [h * 360, s * 100, l * 100];
+  // Convert to CSS ranges and return
+  return [h * 360, s * 100, l * 100];
 }
