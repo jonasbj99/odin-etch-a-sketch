@@ -13,23 +13,25 @@
     <main class="main-row">
       <section class="settings-section">
         <!-- Color Changer -->
-        <label>
-          Color
-          <input id="colorChanger" type="color" />
-        </label>
-        <!-- Color Picker -->
-        <!-- Clear Grid -->
-        <!-- Grid Toggle -->
-        <!-- Grid Size -->
+        <input id="colorChanger" type="color" />
+        <button id="colorPickerBtn">Color Picker</button>
+        <button id="toggleGridBtn">Toggle Grid</button>
+        <button id="clearBtn">Clear</button>
+        <div class="size-grid">
+          <button value="16" class="gridSizeBtn">16 x 16</button>
+          <button value="32" class="gridSizeBtn">32 x 32</button>
+          <button value="64" class="gridSizeBtn">64 x 64</button>
+          <button value="128" class="gridSizeBtn">128 x 128</button>
+        </div>
       </section>
       <div class="etch-container"></div>
       <section class="tool-section">
-        <!-- Paint -->
-        <!-- Erase -->
-        <!-- Fill -->
-        <!-- Rainbow -->
-        <!-- Darken -->
-        <!-- Lighten -->
+        <button id="paintBtn" class="tool-button">Paint</button>
+        <button id="eraseBtn" class="tool-button">Erase</button>
+        <button id="fillBtn" class="tool-button">Fill</button>
+        <button id="paintbowBtn" class="tool-button">Paintbow</button>
+        <button id="darkenBtn" class="tool-button">Darken</button>
+        <button id="lightenBtn" class="tool-button">Lighten</button>
       </section>
     </main>
   </body>

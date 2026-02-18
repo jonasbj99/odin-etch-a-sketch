@@ -1,3 +1,12 @@
+// Default settings
+const settingsObj = {
+  color: "#000000",
+  rainbowColor: "#ffffff",
+  size: 16,
+  clickOn: true,
+  activeTool: paintPixel,
+};
+
 // Grid container
 const etchContainer = document.querySelector(".etch-container");
 
@@ -6,51 +15,51 @@ const colorChanger = document.querySelector("#colorChanger");
 colorChanger.addEventListener("change", (event) => {
   changeColor(event.target.value);
 });
+const toggleGridBtn = document.querySelector("#toggleGridBtn");
+toggleGridBtn.addEventListener("click", toggleGrid);
+const clearBtn = document.querySelector("#clearBtn");
+clearBtn.addEventListener("click", clearGrid);
+const gridSizeButtons = document.querySelectorAll(".gridSizeBtn");
+gridSizeButtons.forEach((btn) =>
+  btn.addEventListener("click", () => changeGrid(btn, btn.value)),
+);
 
-let mouseDown = false;
-document.addEventListener("mousedown", () => (mouseDown = true));
-document.addEventListener("mouseup", () => (mouseDown = false));
+// Tool elements
+const colorPickerBtn = document.querySelector("#colorPickerBtn");
+colorPickerBtn.addEventListener("click", () =>
+  changeTool(colorPickerBtn, pipettePixel),
+);
+const paintBtn = document.querySelector("#paintBtn");
+const eraseBtn = document.querySelector("#eraseBtn");
+const fillBtn = document.querySelector("#fillBtn");
+const paintbowBtn = document.querySelector("#paintbowBtn");
+const darkenBtn = document.querySelector("#darkenBtn");
+const lightenBtn = document.querySelector("#lightenBtn");
 
-// Default settings
-const settingsObj = {
-  color: "#000000",
-  rainbowColor: "#ffffff",
-  size: 16,
-  clickOn: true,
-  activeTool: colorPixel,
-};
+const activeArr = [
+  colorPickerBtn,
+  paintBtn,
+  eraseBtn,
+  paintbowBtn,
+  darkenBtn,
+  lightenBtn,
+];
+
+// Tool event listeners
+paintBtn.addEventListener("click", () => changeTool(paintBtn, paintPixel));
+eraseBtn.addEventListener("click", () => changeTool(eraseBtn, erasePixel));
+fillBtn.addEventListener("click", () => changeTool(fillBtn, fillPixels));
+paintbowBtn.addEventListener("click", () =>
+  changeTool(paintbowBtn, paintbowPixel),
+);
+darkenBtn.addEventListener("click", () => changeTool(darkenBtn, darkenPixel));
+lightenBtn.addEventListener("click", () =>
+  changeTool(lightenBtn, lightenPixel),
+);
 
 generateGrid(settingsObj.size);
 
-// ?!? Consider saving pixels when changing size
-function generateGrid(size) {
-  settingsObj.size = size;
-
-  // Clear existing grid
-  const children = etchContainer.querySelectorAll("*");
-  children.forEach((child) => child.remove());
-
-  // Add new grid children based on size x size
-  for (let i = 1; i <= size; i++) {
-    const newRow = document.createElement("div");
-    newRow.classList.add("etch-row");
-
-    for (let j = 1; j <= size; j++) {
-      const newEl = document.createElement("div");
-      newEl.setAttribute("id", `p${i}-${j}`);
-      newEl.classList.add("etch-pixel");
-
-      newEl.addEventListener("mouseenter", useActiveTool);
-      newEl.addEventListener("mousedown", useActiveTool);
-
-      newRow.appendChild(newEl);
-    }
-
-    etchContainer.appendChild(newRow);
-  }
-}
-
-function colorPixel(el) {
+function paintPixel(el) {
   el.style.backgroundColor = settingsObj.color;
 }
 
@@ -112,12 +121,17 @@ function arrayToId(arr) {
   return `#p${arr[0]}-${arr[1]}`;
 }
 
-function rainbowPixel(el) {
+function paintbowPixel(el) {
   const rNum = Math.floor(Math.random() * 255);
   const gNum = Math.floor(Math.random() * 255);
   const bNum = Math.floor(Math.random() * 255);
   settingsObj.rainbowColor = `rgb(${rNum}, ${gNum}, ${bNum})`;
   el.style.backgroundColor = settingsObj.rainbowColor;
+}
+
+function pipettePixel(el) {
+  const color = getComputedStyle(el).backgroundColor;
+  changeColor(color);
 }
 
 // ?!? Consider different solution for pipette
@@ -131,9 +145,48 @@ function useActiveTool(event) {
   }
 }
 
-function pipettePixel(el) {
-  const color = getComputedStyle(el).backgroundColor;
-  changeColor(color);
+function changeTool(el, func) {
+  activeArr.forEach((btn) => btn.classList.remove("active"));
+  el.classList.add("active");
+  settingsObj.activeTool = func;
+}
+
+function changeGrid(btn, size) {
+  if (size != settingsObj.size) {
+    const oldSize = settingsObj.size;
+    settingsObj.size = size;
+    gridSizeButtons.forEach((btn) => btn.classList.remove("active"));
+    btn.classList.add("active");
+    generateGrid(size);
+  }
+}
+
+// ?!? Consider saving pixels when changing size
+function generateGrid(size) {
+  settingsObj.size = size;
+
+  // Clear existing grid
+  const children = etchContainer.querySelectorAll("*");
+  children.forEach((child) => child.remove());
+
+  // Add new grid children based on size x size
+  for (let i = 1; i <= size; i++) {
+    const newRow = document.createElement("div");
+    newRow.classList.add("etch-row");
+
+    for (let j = 1; j <= size; j++) {
+      const newEl = document.createElement("div");
+      newEl.setAttribute("id", `p${i}-${j}`);
+      newEl.classList.add("etch-pixel");
+
+      newEl.addEventListener("mouseenter", useActiveTool);
+      newEl.addEventListener("mousedown", useActiveTool);
+
+      newRow.appendChild(newEl);
+    }
+
+    etchContainer.appendChild(newRow);
+  }
 }
 
 function changeColor(color) {
