@@ -2,9 +2,9 @@
 const settingsObj = {
   color: "#000000",
   rainbowColor: "#ffffff",
-  size: 16,
+  size: null,
   clickOn: true,
-  activeTool: paintPixel,
+  activeTool: null,
 };
 
 // Grid container
@@ -40,6 +40,7 @@ const activeArr = [
   colorPickerBtn,
   paintBtn,
   eraseBtn,
+  fillBtn,
   paintbowBtn,
   darkenBtn,
   lightenBtn,
@@ -57,7 +58,9 @@ lightenBtn.addEventListener("click", () =>
   changeTool(lightenBtn, lightenPixel),
 );
 
-generateGrid(settingsObj.size);
+// Default grid and tool
+changeGrid(gridSizeButtons[0], 16);
+changeTool(paintBtn, paintPixel);
 
 function paintPixel(el) {
   el.style.backgroundColor = settingsObj.color;
