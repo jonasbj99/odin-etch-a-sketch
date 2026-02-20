@@ -120,6 +120,33 @@ function fillPixels(el) {
   }
 }
 
+function fillPixels(el) {
+  const id = el.id.slice(1).split("-");
+  const y = +id[0];
+  const x = +id[1];
+  const currentBg = convertToHex(getComputedStyle(el).backgroundColor);
+
+  if (currentBg === settingsObj.color) {
+    return;
+  } else {
+    el.style.backgroundColor = settingsObj.color;
+
+    let adjacent = [];
+    // Add adjacent pixels within grid bounds
+    if (x < settingsObj.size) adjacent.push(`#p${y}-${x + 1}`);
+    if (x > 1) adjacent.push(`#p${y}-${x - 1}`);
+    if (y < settingsObj.size) adjacent.push(`#p${y + 1}-${x}`);
+    if (y > 1) adjacent.push(`#p${+y - 1}-${x}`);
+
+    // Call function on adjacent pixels with same background color
+    adjacent.forEach((id) => {
+      const adjEl = document.querySelector(id);
+      const adjBg = convertToHex(getComputedStyle(adjEl).backgroundColor);
+      if (currentBg === adjBg) fillPixels(adjEl);
+    });
+  }
+}
+
 function paintbowPixel(el) {
   const rNum = Math.floor(Math.random() * 255);
   const gNum = Math.floor(Math.random() * 255);
@@ -152,14 +179,19 @@ function changeTool(el, func) {
 
 function changeGrid(btn, size) {
   if (size != settingsObj.size) {
-    let text =
-      "Choosing a smaller grid size will clear the grid, please confirm you want a smaller grid size.";
-    if (size < settingsObj.size && confirm(text) == false) {
-      return;
-    }
     gridSizeButtons.forEach((btn) => btn.classList.remove("active"));
     btn.classList.add("active");
+
     const prevPixels = saveGrid();
+
+    if (size < settingsObj.size && prevPixels.length > 0) {
+      let confirmText =
+        "Choosing a smaller grid size will clear the grid, please confirm you want a smaller grid size.";
+      if (confirm(confirmText) == false) return;
+    }
+
+    gridSizeButtons.forEach((btn) => btn.classList.remove("active"));
+    btn.classList.add("active");
     const prevSize = settingsObj.size;
     settingsObj.size = size;
     generateGrid(size);
