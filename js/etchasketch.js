@@ -73,53 +73,26 @@ function erasePixel(el) {
 function darkenPixel(el) {
   const rgb = getComputedStyle(el).backgroundColor;
   const hsl = hexToHsl(convertToHex(rgb));
-  let h = hsl[0];
-  let s = hsl[1];
+  const h = hsl[0];
+  const s = hsl[1];
   // Subtract 10% lightness, limited to 0
-  let l = hsl[2] - 10 <= 0 ? 0 : hsl[2] - 10;
+  const l = hsl[2] - 10 <= 0 ? 0 : hsl[2] - 10;
   el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 function lightenPixel(el) {
   const rgb = getComputedStyle(el).backgroundColor;
   const hsl = hexToHsl(convertToHex(rgb));
-  let h = hsl[0];
-  let s = hsl[1];
+  const h = hsl[0];
+  const s = hsl[1];
   // Add 10% lightness, limited to 100
-  let l = hsl[2] + 10 >= 100 ? 100 : hsl[2] + 10;
+  const l = hsl[2] + 10 >= 100 ? 100 : hsl[2] + 10;
   el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
 }
 
 // !!! Problem with large pixel areas due to call stack issues
 // !!! Consider while looping horizontally saving same color pixels to array
 // !!! Then loop vertically finding the rest of the connected pixels
-function fillPixels(el) {
-  const id = el.id.slice(1).split("-");
-  const y = +id[0];
-  const x = +id[1];
-  const currentBg = convertToHex(getComputedStyle(el).backgroundColor);
-
-  if (currentBg === settingsObj.color) {
-    return;
-  } else {
-    el.style.backgroundColor = settingsObj.color;
-
-    let adjacent = [];
-    // Add adjacent pixels within grid bounds
-    if (x < settingsObj.size) adjacent.push(`#p${y}-${x + 1}`);
-    if (x > 1) adjacent.push(`#p${y}-${x - 1}`);
-    if (y < settingsObj.size) adjacent.push(`#p${y + 1}-${x}`);
-    if (y > 1) adjacent.push(`#p${+y - 1}-${x}`);
-
-    // Call function on adjacent pixels with same background color
-    adjacent.forEach((id) => {
-      const adjEl = document.querySelector(id);
-      const adjBg = convertToHex(getComputedStyle(adjEl).backgroundColor);
-      if (currentBg === adjBg) fillPixels(adjEl);
-    });
-  }
-}
-
 function fillPixels(el) {
   const id = el.id.slice(1).split("-");
   const y = +id[0];
@@ -179,23 +152,20 @@ function changeTool(el, func) {
 
 function changeGrid(btn, size) {
   if (size != settingsObj.size) {
-    gridSizeButtons.forEach((btn) => btn.classList.remove("active"));
-    btn.classList.add("active");
-
+    const prevSize = settingsObj.size;
     const prevPixels = saveGrid();
 
-    if (size < settingsObj.size && prevPixels.length > 0) {
+    if (size < prevSize && prevPixels.length > 0) {
       let confirmText =
         "Choosing a smaller grid size will clear the grid, please confirm you want a smaller grid size.";
-      if (confirm(confirmText) == false) return;
+      if (confirm(confirmText) === false) return;
     }
+
+    generateGrid(size);
+    applyGrid(prevPixels, prevSize);
 
     gridSizeButtons.forEach((btn) => btn.classList.remove("active"));
     btn.classList.add("active");
-    const prevSize = settingsObj.size;
-    settingsObj.size = size;
-    generateGrid(size);
-    applyGrid(prevPixels, prevSize);
   }
 }
 
