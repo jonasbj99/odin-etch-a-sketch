@@ -21,7 +21,7 @@ const clearBtn = document.querySelector("#clearBtn");
 clearBtn.addEventListener("click", clearGrid);
 const gridSizeButtons = document.querySelectorAll(".gridSizeBtn");
 gridSizeButtons.forEach((btn) =>
-  btn.addEventListener("click", () => changeGrid(btn, btn.value)),
+  btn.addEventListener("click", () => changeGrid(btn, +btn.value)),
 );
 
 // Tool elements
@@ -152,6 +152,11 @@ function changeTool(el, func) {
 
 function changeGrid(btn, size) {
   if (size != settingsObj.size) {
+    let text =
+      "Choosing a smaller grid size will clear the grid, please confirm you want a smaller grid size.";
+    if (size < settingsObj.size && confirm(text) == false) {
+      return;
+    }
     gridSizeButtons.forEach((btn) => btn.classList.remove("active"));
     btn.classList.add("active");
     const prevPixels = saveGrid();
