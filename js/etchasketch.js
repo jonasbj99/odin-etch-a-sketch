@@ -120,10 +120,6 @@ function fillPixels(el) {
   }
 }
 
-function arrayToId(arr) {
-  return `#p${arr[0]}-${arr[1]}`;
-}
-
 function paintbowPixel(el) {
   const rNum = Math.floor(Math.random() * 255);
   const gNum = Math.floor(Math.random() * 255);
@@ -156,11 +152,13 @@ function changeTool(el, func) {
 
 function changeGrid(btn, size) {
   if (size != settingsObj.size) {
-    const oldSize = settingsObj.size;
-    settingsObj.size = size;
     gridSizeButtons.forEach((btn) => btn.classList.remove("active"));
     btn.classList.add("active");
+    const prevPixels = saveGrid();
+    const prevSize = settingsObj.size;
+    settingsObj.size = size;
     generateGrid(size);
+    applyGrid(prevPixels, prevSize);
   }
 }
 
@@ -190,6 +188,46 @@ function generateGrid(size) {
 
     etchContainer.appendChild(newRow);
   }
+}
+
+function saveGrid() {
+  const allPixels = etchContainer.querySelectorAll(".etch-pixel");
+  let savedPixels = [];
+
+  allPixels.forEach((px) => {
+    let coord = px.id.slice(1).split("-");
+    if (px.style.backgroundColor != "") {
+      savedPixels.push({
+        row: coord[0],
+        col: coord[1],
+        bg: convertToHex(getComputedStyle(px).backgroundColor),
+      });
+    }
+  });
+
+  return savedPixels;
+}
+
+function applyGrid(prevGrid, prevSize) {
+  const scale = settingsObj.size / prevSize;
+
+  if (scale > 1) {
+    prevGrid.forEach((px) => {
+      for (let i = 1; i <= scale; i++) {
+        let row = (px.row - 1) * scale + i;
+        for (let j = 1; j <= scale; j++) {
+          let col = (px.col - 1) * scale + j;
+          let newID = arrayToId([row, col]);
+          let newEl = etchContainer.querySelector(newID);
+          newEl.style.backgroundColor = px.bg;
+        }
+      }
+    });
+  }
+}
+
+function arrayToId(arr) {
+  return `#p${arr[0]}-${arr[1]}`;
 }
 
 function changeColor(color) {
