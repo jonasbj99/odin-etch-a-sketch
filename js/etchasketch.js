@@ -90,35 +90,51 @@ function lightenPixel(el) {
   el.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
 }
 
-// !!! Problem with large pixel areas due to call stack issues
-// !!! Consider while looping horizontally saving same color pixels to array
-// !!! Then loop vertically finding the rest of the connected pixels
 function fillPixels(el) {
-  const id = el.id.slice(1).split("-");
-  const y = +id[0];
-  const x = +id[1];
-  const currentBg = convertToHex(getComputedStyle(el).backgroundColor);
+  const startColor = convertToHex(getComputedStyle(el).backgroundColor);
 
-  if (currentBg === settingsObj.color) {
-    return;
-  } else {
-    el.style.backgroundColor = settingsObj.color;
+  if (startColor != settingsObj.color) {
+    const adjacent = [
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [-1, 0],
+    ];
 
-    let adjacent = [];
-    // Add adjacent pixels within grid bounds
-    if (x < settingsObj.size) adjacent.push(`#p${y}-${x + 1}`);
-    if (x > 1) adjacent.push(`#p${y}-${x - 1}`);
-    if (y < settingsObj.size) adjacent.push(`#p${y + 1}-${x}`);
-    if (y > 1) adjacent.push(`#p${+y - 1}-${x}`);
+    let checkArr = [];
 
-    // Call function on adjacent pixels with same background color
-    adjacent.forEach((id) => {
-      const adjEl = document.querySelector(id);
-      const adjBg = convertToHex(getComputedStyle(adjEl).backgroundColor);
-      if (currentBg === adjBg) fillPixels(adjEl);
-    });
+    let notEmpty = checkArr.push(`#${el.id}`);
+
+    while (notEmpty) {
+      let currentId = checkArr.pop();
+      let currentEl = document.querySelector(currentId);
+      currentEl.style.backgroundColor = settingsObj.color;
+
+      let currentIdArr = currentId.slice(2).split("-");
+      let currentRow = +currentIdArr[0];
+      let currentCol = +currentIdArr[1];
+
+      adjacent.forEach((dir) => {
+        let adjacentRow = currentRow + dir[0];
+        let adjacentCol = currentCol + dir[1];
+        let adjacentId = arrayToId([adjacentRow, adjacentCol]);
+        let adjacentEl = document.querySelector(adjacentId);
+
+        if (adjacentEl && !checkArr.includes(adjacentId)) {
+          let adjacentColor = convertToHex(
+            getComputedStyle(adjacentEl).backgroundColor,
+          );
+
+          if (adjacentColor === startColor) {
+            notEmpty = checkArr.push(adjacentId);
+          }
+        }
+      });
+    }
   }
 }
+
+function getAdjacentPixels() {}
 
 function paintbowPixel(el) {
   const rNum = Math.floor(Math.random() * 255);
