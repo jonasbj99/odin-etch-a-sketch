@@ -102,6 +102,28 @@
   }
 }
 
+.draw-grid {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  button {
+    border-radius: 0;
+  }
+
+  button:nth-child(1) {
+    border-right-width: 1px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+
+  button:nth-child(2) {
+    border-left-width: 1px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+}
+
 .tool-section {
   background-color: var(--prim-col);
   padding: 10px;
