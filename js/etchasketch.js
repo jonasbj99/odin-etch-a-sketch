@@ -3,7 +3,7 @@ const settingsObj = {
   color: "#000000",
   rainbowColor: "#ffffff",
   size: null,
-  clickOn: true,
+  clickOn: null,
   activeTool: null,
 };
 
@@ -22,6 +22,10 @@ clearBtn.addEventListener("click", clearGrid);
 const gridSizeButtons = document.querySelectorAll(".gridSizeBtn");
 gridSizeButtons.forEach((btn) =>
   btn.addEventListener("click", () => changeGrid(btn, +btn.value)),
+);
+const drawModeButtons = document.querySelectorAll(".drawModeBtn");
+drawModeButtons.forEach((btn) =>
+  btn.addEventListener("click", () => changeMode(btn, btn.value)),
 );
 
 // Tool elements
@@ -58,9 +62,11 @@ lightenBtn.addEventListener("click", () =>
   changeTool(lightenBtn, lightenPixel),
 );
 
-// Default grid and tool
+// Default active settings and tool
 changeGrid(gridSizeButtons[0], 16);
 changeTool(paintBtn, paintPixel);
+changeMode(drawModeButtons[0], true);
+// !!! SET CLICK ON TRUE
 
 function paintPixel(el) {
   el.style.backgroundColor = settingsObj.color;
@@ -164,6 +170,12 @@ function changeTool(el, func) {
   activeArr.forEach((btn) => btn.classList.remove("active"));
   el.classList.add("active");
   settingsObj.activeTool = func;
+}
+
+function changeMode(el, bool) {
+  drawModeButtons.forEach((btn) => btn.classList.remove("active"));
+  el.classList.add("active");
+  settingsObj.clickOn = +bool;
 }
 
 function changeGrid(btn, size) {
