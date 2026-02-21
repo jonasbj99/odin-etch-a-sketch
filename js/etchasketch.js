@@ -66,7 +66,6 @@ lightenBtn.addEventListener("click", () =>
 changeGrid(gridSizeButtons[0], 16);
 changeTool(paintBtn, paintPixel);
 changeMode(drawModeButtons[0], true);
-// !!! SET CLICK ON TRUE
 
 function paintPixel(el) {
   el.style.backgroundColor = settingsObj.color;
@@ -140,8 +139,6 @@ function fillPixels(el) {
   }
 }
 
-function getAdjacentPixels() {}
-
 function paintbowPixel(el) {
   const rNum = Math.floor(Math.random() * 255);
   const gNum = Math.floor(Math.random() * 255);
@@ -155,7 +152,6 @@ function pipettePixel(el) {
   changeColor(color);
 }
 
-// ?!? Consider different solution for pipette
 function useActiveTool(event) {
   const el = event.currentTarget;
   const tool = settingsObj.activeTool;
@@ -197,7 +193,6 @@ function changeGrid(btn, size) {
   }
 }
 
-// ?!? Consider saving pixels when changing size
 function generateGrid(size) {
   settingsObj.size = size;
 
