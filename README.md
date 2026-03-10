@@ -1,5 +1,6 @@
 # odin-etch-a-sketch
 Etch-a-Sketch project from The Odin Project in the JavaScript Basics section of the Foundations course.
+
 ![Preview of the Etch-a-Sketch project.](img/etch-preview.png)
 
 ## Demonstrated skills
