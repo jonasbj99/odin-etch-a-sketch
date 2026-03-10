@@ -1,5 +1,5 @@
 # odin-etch-a-sketch
-Etch-a-Sketch project from The Odin Project in the JavaScript Basics section of the Foundations course. Thanks to [CHKiens](https://github.com/CHKiens) for trying out the product and making the drawing seen in the preivew below!
+Etch-a-Sketch project from The Odin Project in the JavaScript Basics section of the Foundations course. Thanks to [CHKiens](https://github.com/CHKiens) for trying out the project and making the drawing seen in the preivew below!
 
 ![Preview of the Etch-a-Sketch project.](img/etch-preview.png)
 
